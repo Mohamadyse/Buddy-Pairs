@@ -6,7 +6,8 @@ namespace ConsoleApp3
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            Console.WriteLine(Kata.Buddy(1071625, 1103735));
+             
         }
     }
 }
