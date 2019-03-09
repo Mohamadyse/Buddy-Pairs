@@ -1,130 +1,73 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace ConsoleApp3
+﻿namespace ConsoleApp3
 {
+    using System;
     public class Kata
     {
-
-        public static string Buddy(long start, long limit)
+        //"1 2 0 4 7\r\n0 2 0 2 8\r\n0 0 -1 4 6\r\n1 2 3 2 3"
+        public static string Solve(string input)
         {
+            int[,] factors = new int[3, 4];
+            MakeFactors(input, factors);
+            var d = calculateDeterminant(factors);
+            if (d == 0) return "SOLUTION=NONE";
+            var d0 = DI(0, factors);
+            var d1 = DI(1, factors);
+            var d2 = DI(2, factors);
+            var dd0 = (double)calculateDeterminant(d0);
+            var dd1 = (double)calculateDeterminant(d1);
+            var dd2 = (double)calculateDeterminant(d2);
+            var x0 =  dd0/d;
+             x0 = Math.Round(dd0/d, 14);
+            var x1 = dd1 / d;
+             x1 = Math.Round(dd1 / d, 14);
+            var x2 = dd2;
+             x2 = Math.Round(dd2 / d, 14);
+            string result = $"SOLUTION=({x0}; {x1}; {x2})";
+            return result;
+        }
 
-            for (long i = start; i <= limit; i++)
+        private static int calculateDeterminant(int[,] f)
+        {
+            var s = f[0, 0] * (f[1, 1] * f[2, 2] - f[1, 2] * f[2, 1]) - f[0, 1] * (f[1, 0] * f[2, 2] - f[1, 2] * f[2, 0]) + f[0, 2] * (f[1, 0] * f[2, 1] - f[1, 1] * f[2, 0]);
+            return s;
+        }
+
+        private static void MakeFactors(string input, int[,] factors)
+        {
+            var lines = input.Split("\r\n");
+            string[] numbers = new string[3]; ;
+            var i = 0;
+            foreach (var line in lines)
             {
-
-                long sumOfdiviors = Sumera(FindDivisiors(i));
-                long potenialBudy = sumOfdiviors - 1;
-                if (!(potenialBudy > i))
+                var j = 0;
+                numbers = line.Split(" ");
+                foreach (var number in numbers)
                 {
-                    continue;
+                    factors[i, j] = int.Parse(number);
+                    j++;
                 }
-                List<long> divisorsOfPotenialBudy = FindDivisiors(potenialBudy);
-                long sumOfdiviorsofPotential = Sumera(divisorsOfPotenialBudy);
-                if ((potenialBudy + 1 == sumOfdiviors) && (i + 1 == sumOfdiviorsofPotential))
-                    return $"({i} {potenialBudy})";
+                i++;
             }
-
-
-            return "Nothing";
         }
 
-        private static long Sumera(List<long> divisors)
+        public static int[,] DI(int column, int[,] f)
         {
-            long sum = 0;
-            divisors.ForEach(a => sum += a);
-            return sum;
-        }
-        private static List<long> FindDivisiors(long i)
-        {
-            var divisors = new List<long>();
-            for (long j = 1; j < i; j++)
+            var result = new int[3, 3];
+            for (int i = 0; i < f.GetLength(0); i++)
             {
-                if (i % j == 0) divisors.Add(j);
-            }
-            return divisors;
-        }
-
-        /*
-         public static List<long> FindPrimes(int number)
-         {
-             var primes = new List<long>();
-
-             for (int div = 2; div <= number; div++)
-             {
-                 while (number % div == 0)
-                 {
-                     primes.Add(div);
-                     number = number / div;
-                 }
-             }
-             return primes;
-         }
-        */
-
-        public static List<long> FindPrimes(int n)
-        {
-            var primes = new List<long>();
-            while (n % 2 == 0)
-            {
-              
-
-                n /= 2;
-                primes.Add(n);
-            }
-
-            // n must be odd at this point. So we can 
-            // skip one element (Note i = i +2) 
-            for (int i = 3; i <= Math.Sqrt(n); i += 2)
-            {
-                // While i divides n, print i and divide n 
-                while (n % i == 0)
+                for (int j = 0; j < f.GetLength(1)-1; j++)
                 {
-                 
-                    n /= i;
-                    primes.Add(n);
-
-                }
-            }
-            return primes;
- 
-        }
-
-       
-
-    
-
-
-
-    public static List<long> PowerSet(List<long> setOfPrimes)
-        {
-           
-                int n = setOfPrimes.Count;
-                // Power set contains 2^N subsets.
-                int powerSetCount = 1 << n;
-                var ans = new List<long>();
-
-                for (int setMask = 0; setMask < powerSetCount-1; setMask++)
-                {
-            
-                var multiplication = 1L;
-                    for (int i = 0; i < n; i++)
+                    if (j != column)
                     {
-                        // Checking whether i'th element of input collection should go to the current subset.
-                        if ((setMask & (1 << i)) > 0)
-                        {
-                        multiplication *= setOfPrimes[i];
-                        }
+                        result[i, j] = f[i, j];
+                    }
+                    else
+                    {
+                        result[i, j] = f[i, 3];
+                    }
                 }
-                if (!(ans.Contains(multiplication)))
-                    ans.Add(multiplication);
             }
-
-            return ans;
-            
+            return result;
         }
-
-
-
     }
 }
